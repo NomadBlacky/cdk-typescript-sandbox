@@ -27,5 +27,16 @@ export class MyAppStack extends cdk.Stack {
             // domainName: 'cdk-typescript-sandbox.nomadblacky.dev.',
             // domainZone: route53.HostedZone.fromHostedZoneId(this, 'MyZone', 'xxxxxxxx')
         });
+
+        new ec2.Instance(this, "MyEC2Instance", {
+            vpc: vpc,
+            instanceType: new ec2.InstanceType("t2.micro"),
+            machineImage: new ec2.AmazonLinuxImage({
+                generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
+                edition: ec2.AmazonLinuxEdition.STANDARD,
+                virtualization: ec2.AmazonLinuxVirt.HVM,
+                storage: ec2.AmazonLinuxStorage.EBS
+            })
+        })
     }
 }
