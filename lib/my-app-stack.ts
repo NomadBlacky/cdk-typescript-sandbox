@@ -2,6 +2,7 @@ import cdk = require("@aws-cdk/core");
 import ec2 = require("@aws-cdk/aws-ec2");
 import ecs = require("@aws-cdk/aws-ecs");
 import patterns = require("@aws-cdk/aws-ecs-patterns");
+import iam = require("@aws-cdk/aws-iam");
 //import route53 = require("@aws-cdk/aws-route53");
 
 export class MyAppStack extends cdk.Stack {
@@ -28,7 +29,14 @@ export class MyAppStack extends cdk.Stack {
             // domainZone: route53.HostedZone.fromHostedZoneId(this, 'MyZone', 'xxxxxxxx')
         });
 
-        new ec2.Instance(this, "MyEC2Instance", {
+        const role = new iam.Role(this, "MyRole", {
+            assumedBy: new iam.ServicePrincipal("ec2.amazonaws.com"),
+            managedPolicies: [
+                iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AmazonEC2RoleforSSM")
+            ]
+        });
+
+        const ec2Instance = new ec2.Instance(this, "MyEC2Instance", {
             vpc: vpc,
             instanceType: new ec2.InstanceType("t2.micro"),
             machineImage: new ec2.AmazonLinuxImage({
@@ -36,7 +44,14 @@ export class MyAppStack extends cdk.Stack {
                 edition: ec2.AmazonLinuxEdition.STANDARD,
                 virtualization: ec2.AmazonLinuxVirt.HVM,
                 storage: ec2.AmazonLinuxStorage.EBS
-            })
-        })
+            }),
+            role: role
+        });
+
+        ec2Instance.addUserData(
+            "#!/bin/bash",
+            "sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm",
+            "sudo systemctl start amazon-ssm-agent"
+        );
     }
 }
