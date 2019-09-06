@@ -36,22 +36,9 @@ export class MyAppStack extends cdk.Stack {
             ]
         });
 
-        const ec2Instance = new ec2.Instance(this, "MyEC2Instance", {
+        new ec2.BastionHostLinux(this, "MyBastionHost", {
             vpc: vpc,
-            instanceType: new ec2.InstanceType("t2.micro"),
-            machineImage: new ec2.AmazonLinuxImage({
-                generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
-                edition: ec2.AmazonLinuxEdition.STANDARD,
-                virtualization: ec2.AmazonLinuxVirt.HVM,
-                storage: ec2.AmazonLinuxStorage.EBS
-            }),
-            role: role
-        });
-
-        ec2Instance.addUserData(
-            "#!/bin/bash",
-            "sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm",
-            "sudo systemctl start amazon-ssm-agent"
-        );
+            instanceType: new ec2.InstanceType("t2.micro")
+        })
     }
 }
