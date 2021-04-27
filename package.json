@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "@aws-cdk/core": "^1.97.0",
-    "@nomadblacky/hello-cdk-lib": "^0.0.26"
+    "@nomadblacky/cdk-datadog-resources": "0.0.2",
+    "@nomadblacky/hello-cdk-lib": "^0.0.26",
+    "@types/node": "^15.0.0"
   }
 }
